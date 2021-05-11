@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
+:root {
+  --brown: #55423d;
+  --dark-brown: #271c19;
+  --dark: #140d0b;
+  --light: #fffffe;
+  --middle-light: #fff3ec;
+  --highlight: #e78fb3;
+  --secondary: #ffc0ad;
+  --tertiary: #9656a1;
+}
+
+body {
+  font-family: 'Indie Flower', cursive;
+  margin: 0;
+  padding: 0;
+  background-color: var(--brown);
+}
+
+h1 {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--light);
+}
+
+.message, .announcement {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--middle-light);
+}
+
+#container {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+  width: 364px;
+  margin: 0 auto;
+}
+
+.box {
+  box-sizing: border-box;
+  background-color: var(--middle-light);
+	border: 3px solid var(--brown);
+	font-size:80px;
+	color: var(--highlight);
+	border-radius: 10px 10px 10px 10px;
+  height: 120px;
+  flex: 0 0 33%;
+  text-align: center;
+}
+
+.box-highlight {
+  color: var(--middle-light);
+  background-color: var(--tertiary);
+}
+
+.circle:after {
+  content: 'O';
+}
+
+.cross:after {
+  content: 'X';
+}
+
+.announcement {
+  background-color: var(--dark);
+  position: fixed;
+  top: 30%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  transition: opacity 0.15s;
+}
+
+.hide {
+  opacity: 0;
+  z-index: -99;
+}
+
+.announcement .btn {
+  margin: 0.5rem 1rem;
+}
+
+.btn {
+  font-size: 1.5rem;
+}
+
+.btn-primary {
+  color: var(--dark-brown);
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+}
+
+.btn-primary:focus {
+  color: var(--dark-brown);
+  background-color: var(--highlight);
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 0.25rem var(--brown);
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+  color: var(--dark-brown);
+  background-color: var(--highlight);
+  border-color: var(--highlight);
+}
+
+.btn-secondary {
+  color: var(--middle-light);
+  background-color: var(--brown);
+  border-color: var(--brown);
+}
+
+.btn-secondary:focus {
+  color: var(--middle-light);
+  background-color: var(--highlight);
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 0.25rem var(--tertiary);
+}
+
+.btn-secondary:hover,
+.btn-secondary:active {
+  color: var(--middle-light);
+  background-color: var(--highlight);
+  border-color: var(--highlight);
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: var(--light);
+  background-color: var(--dark-brown);
+}
+
+footer p {
+  text-align: center;
+  margin: 0;
+  line-height: 2rem;
+}
+
+footer a {
+  text-decoration: none;
+  color: var(--secondary);
+}
+
+footer a:hover,
+footer a:active,
+footer a:visited {
+  color: var(--highlight);
+}
+
+footer .github::before {
+  content: ' ・ '
+}
