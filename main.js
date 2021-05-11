@@ -99,8 +99,8 @@ const controller = {
   checkMatch (winPatterns, toCheckPattern, sign) {
     if (toCheckPattern.length < 3) return
     winPatterns.forEach(pattern => {
-      const result = toCheckPattern.every(p => pattern.includes(p))
-      result === true ? this.markWinner(sign, pattern) : null
+      const result = toCheckPattern.filter(p => pattern.includes(p))
+      result.length >= 3 ? this.markWinner(sign, pattern) : null
     })
   },
   markWinner (sign, pattern) {
