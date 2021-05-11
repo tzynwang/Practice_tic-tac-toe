@@ -140,7 +140,7 @@ view.drawCheckerboard()
 // 開始遊戲
 controller.setGameStatus('playing')
 
-// 點擊棋盤進行O/X/空切換
+// 畫記
 elementObjects.container.addEventListener('click', view.drawSign)
 
 // 再玩一局
