@@ -16,16 +16,24 @@
 <body>
   <main>
     <h1>Tic Tac Toe</h1>
-    <p class="message">Turn: <span id="currentSign">0</span></p>
-    <div id="container"></div>
+    <p class="message">First O (circle), then X (cross).</p>
+    <section class="game-player">
+      <button type="button" class="btn btn-primary" data-playerOne="player" data-playerTwo="player">Player vs Player</button>
+      <button type="button" class="btn btn-primary" data-playerOne="player" data-playerTwo="computer" data-computer="playerTwo">Player (O) vs Computer (X)</button>
+      <button type="button" class="btn btn-primary" data-playerOne="computer" data-playerTwo="player" data-computer="playerOne">Player (X) vs Computer (O)</button>
+    </section>
+    <section class="game-area hide">
+      <p class="message">Turn: <span id="currentSign">O</span></p>
+      <div id="container"></div>
 
-    <div class="announcement hide">
-      <p>Winner is <span id="winner"></span></p>
-      <div class="button-wrapper">
-        <button type="button" class="btn btn-primary" id="playAgain">Play Again</button>
-        <button type="button" class="btn btn-secondary" id="close">X</button>
+      <div class="announcement hide">
+        <p id="announcementMessage"></p>
+        <div class="button-wrapper">
+          <button type="button" class="btn btn-primary" id="playAgain">Play Again</button>
+          <button type="button" class="btn btn-secondary" id="close">X</button>
+        </div>
       </div>
-    </div>
+    </section>
   </main>
   <footer>
     <p>Copyright 2021 Charlie (Tzu Yin)<span class="github"><a href="https://github.com/tzynwang/tic-tac-toe" target="_blank">GitHub</a></span></p>
