@@ -1,22 +1,28 @@
 const elementObjects = {
+  gamePlayerSetting: document.querySelector('.game-player'),
+  gameArea: document.querySelector('.game-area'),
   container: document.querySelector('#container'),
   currentSign: document.querySelector('#currentSign'),
   announcement: document.querySelector('.announcement'),
-  winner: document.querySelector('#winner'),
+  announcementMessage: document.querySelector('#announcementMessage'),
   messagePlayAgainButton: document.querySelector('#playAgain'),
   messageCloseButton: document.querySelector('#close')
 }
 
 const config = {
-  start: 'circle', // 'circle' || 'cross'
+  start: 'circle',
   currentSign: 'circle', // 'circle' || 'cross'
+  gameStatus: '',
+  playerOne: { role: '', sign: 'circle' },
+  playerTwo: { role: '', sign: 'cross' },
+  computer: '',
   winPatterns: ['123', '456', '789', '147', '258', '369', '159', '357'],
-  gameStatus: 'playing',
-  winner: '',
-  winPattern: ''
+  winPattern: '',
+  winner: ''
 }
 
 const record = {
+  availableBoxes: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   patternO: [],
   patternX: []
 }
@@ -29,35 +35,70 @@ const view = {
   },
   drawSign (event) {
     const target = event.target
-    // 一局遊戲已結束
-    if (config.gameStatus === 'end') return
-    // 點到已有下棋的格子
-    if (target.classList.length > 1) return
+    const position = Number(target.dataset.number)
+    // 已結束
+    if (config.gameStatus !== 'playing') return
+    // 點到已有畫記的格子
+    if (!record.availableBoxes.includes(position)) return
     // 下棋
     if (target.classList.contains('box')) {
       const currentSign = config.currentSign
-      const position = target.dataset.number
+      target.classList.add(currentSign)
+      controller.patternRecord(currentSign, position)
+      record.availableBoxes.splice(record.availableBoxes.indexOf(position), 1)
       switch (currentSign) {
         case 'circle':
-          target.classList.add('circle')
           config.currentSign = 'cross'
           elementObjects.currentSign.innerHTML = 'X'
-          controller.patternRecord('circle', position)
           controller.checkMatch(config.winPatterns, record.patternO, 'circle')
-          return
+          break
         case 'cross':
-          target.classList.add('cross')
           config.currentSign = 'circle'
           elementObjects.currentSign.innerHTML = 'O'
-          controller.patternRecord('cross', position)
           controller.checkMatch(config.winPatterns, record.patternX, 'cross')
       }
+    }
+    // PVC模式
+    if (config.computer !== undefined) {
+      view.computerDrawSign(config.computer)
+    }
+  },
+  computerDrawSign (player) {
+    // 已結束
+    if (config.gameStatus !== 'playing') return
+    // 準備畫記
+    const computerSign = config[player].sign
+    const canDrawBoxes = record.availableBoxes
+    const index = ~~(Math.random() * canDrawBoxes.length)
+    // 畫記
+    document.querySelector(`.box[data-number="${canDrawBoxes[index]}"]`).classList.add(computerSign)
+    // 記錄格位，更新可畫記格位
+    controller.patternRecord(computerSign, canDrawBoxes[index])
+    record.availableBoxes.splice(index, 1)
+    // 更新UI，檢查是否連線
+    switch (computerSign) {
+      case 'circle':
+        config.currentSign = 'cross'
+        elementObjects.currentSign.innerHTML = 'X'
+        controller.checkMatch(config.winPatterns, record.patternO, 'circle')
+        break
+      case 'cross':
+        config.currentSign = 'circle'
+        elementObjects.currentSign.innerHTML = 'O'
+        controller.checkMatch(config.winPatterns, record.patternX, 'cross')
     }
   },
   announceWinner () {
     this.boxHighlight()
     elementObjects.currentSign.innerHTML = '---'
-    elementObjects.winner.innerHTML = config.winner
+    elementObjects.announcementMessage.innerHTML = `Winner is: ${config.winner}`
+    window.setTimeout(() => {
+      elementObjects.announcement.classList.remove('hide')
+    }, 1000)
+  },
+  announceEven () {
+    elementObjects.currentSign.innerHTML = '---'
+    elementObjects.announcementMessage.innerHTML = 'Game Even'
     window.setTimeout(() => {
       elementObjects.announcement.classList.remove('hide')
     }, 1000)
@@ -78,12 +119,29 @@ const view = {
       box.classList.remove('animate__flash')
     })
   },
-  closeMessageBox () {
-    elementObjects.announcement.classList.add('hide')
+  hideTarget (target) {
+    target.classList.add('hide')
+  },
+  displayTarget (target) {
+    target.classList.remove('hide')
   }
 }
 
 const controller = {
+  setGamePlayer (event) {
+    const target = event.target
+    if (target.tagName === 'BUTTON') {
+      config.playerOne.role = target.dataset.playerone
+      config.playerTwo.role = target.dataset.playertwo
+    }
+    config.computer = target.dataset.computer
+    view.hideTarget(elementObjects.gamePlayerSetting)
+    view.displayTarget(elementObjects.gameArea)
+    // 電腦先手
+    if (config.playerOne.role === 'computer') {
+      view.computerDrawSign(config.computer)
+    }
+  },
   setGameStatus (status) {
     config.gameStatus = status
   },
@@ -97,11 +155,15 @@ const controller = {
     }
   },
   checkMatch (winPatterns, toCheckPattern, sign) {
+    // 畫記數量不足3
     if (toCheckPattern.length < 3) return
+    // 檢查畫記組合
     winPatterns.forEach(pattern => {
       const result = toCheckPattern.filter(p => pattern.includes(p))
       result.length >= 3 ? this.markWinner(sign, pattern) : null
     })
+    // 判定平手
+    if (record.availableBoxes.length === 0) view.announceEven()
   },
   markWinner (sign, pattern) {
     switch (sign) {
@@ -119,7 +181,11 @@ const controller = {
     controller.configUpdate() // this.configUpdate()的this會指向elementObjects.messagePlayAgainButton
     controller.recordUpdate()
     view.resetAllSigns()
-    view.closeMessageBox()
+    view.hideTarget(elementObjects.announcement)
+    // 電腦先手
+    if (config.playerOne.role === 'computer') {
+      view.computerDrawSign(config.computer)
+    }
   },
   configUpdate () {
     config.start = 'circle'
@@ -129,6 +195,7 @@ const controller = {
     config.winPattern = ''
   },
   recordUpdate () {
+    record.availableBoxes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     record.patternO = []
     record.patternX = []
   }
@@ -136,6 +203,9 @@ const controller = {
 
 // 畫棋盤
 view.drawCheckerboard()
+
+// 選擇模式
+elementObjects.gamePlayerSetting.addEventListener('click', controller.setGamePlayer)
 
 // 開始遊戲
 controller.setGameStatus('playing')
@@ -147,4 +217,6 @@ elementObjects.container.addEventListener('click', view.drawSign)
 elementObjects.messagePlayAgainButton.addEventListener('click', controller.startNewGame)
 
 // 關閉提示視窗
-elementObjects.messageCloseButton.addEventListener('click', view.closeMessageBox)
+elementObjects.messageCloseButton.addEventListener('click', () => {
+  view.hideTarget(elementObjects.announcement)
+})
